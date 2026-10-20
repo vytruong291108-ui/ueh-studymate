@@ -1,0 +1,1368 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UEH StudyMate - Nền Tảng Học Nhóm Sinh Viên UEH</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --ueh-navy:#003b5c;
+  --ueh-navy-dark:#00253a;
+  --ueh-orange:#e85d04;
+  --ueh-orange-hover:#f97316;
+  --ueh-bg:#f0f2f5;
+  --ueh-white:#ffffff;
+  --ueh-border:#e4e6eb;
+  --text-main:#050505;
+  --text-muted:#65676b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ueh-bg);color:var(--text-main);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* HEADER */
+header{
+  background:var(--ueh-white); border-bottom:1px solid var(--ueh-border); padding:10px 5%;
+  display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+.logo{font-weight:900;font-size:22px;color:var(--ueh-navy);cursor:pointer;display:flex;align-items:center;gap:6px}
+.logo span{color:var(--ueh-orange)}
+nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.nav-link{
+  display:inline-flex; align-items:center; gap:6px; padding:8px 12px; font-size:14px; font-weight:700; color:var(--ueh-navy);
+  cursor:pointer; border-radius:8px; transition:0.2s; user-select:none; position:relative;
+}
+.nav-link:hover{color:var(--ueh-orange);background:#fff4ed}
+.nav-protected { display: none; gap: 8px; align-items: center; }
+
+.msg-badge {
+  background: #e85d04; color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 999px; font-weight: 800;
+}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;text-align:center;user-select:none;transition:all .2s ease}
+.btn-orange{background:var(--ueh-orange);color:#fff}
+.btn-orange:hover{background:var(--ueh-orange-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,93,4,0.25)}
+.btn-outline{background:#fff;color:var(--ueh-navy);border:1.5px solid var(--ueh-navy)}
+.btn-outline:hover{background:#f0f7fb}
+.btn-gray{background:#e4e6eb;color:#050505}
+.btn-gray:hover{background:#d8dadf}
+.btn-danger{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+
+.auth-guest { display: flex; gap: 8px; align-items: center; }
+.auth-user { display: none; gap: 10px; align-items: center; }
+
+.nav-profile-badge {
+  display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 4px; border-radius: 999px;
+  background: #f0f2f5; cursor: pointer; border: 1px solid var(--ueh-border); transition: 0.2s;
+}
+.nav-profile-badge:hover { background: #e4e6eb; }
+.nav-avatar-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.nav-user-name { font-size: 13.5px; font-weight: 700; color: var(--ueh-navy); }
+
+main{max-width:1040px;margin:20px auto;padding:0 16px}
+.card{background:var(--ueh-white);border-radius:12px;padding:24px;border:1px solid var(--ueh-border);box-shadow:0 2px 12px rgba(0,0,0,0.04);margin-bottom:16px}
+
+/* OTP SIMULATOR BANNER */
+.otp-simulator-banner {
+  background: #eef2ff; border: 1.5px dashed #6366f1; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.otp-code-box {
+  background: #fff; border: 1px solid #c7d2fe; padding: 4px 12px; border-radius: 8px; font-family: monospace; font-size: 18px; font-weight: 800; color: #4338ca; letter-spacing: 2px;
+}
+
+/* MESSENGER */
+.messenger-container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: calc(100vh - 120px);
+  min-height: 580px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid var(--ueh-border);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+@media(max-width:768px){
+  .messenger-container { grid-template-columns: 1fr; height: auto; }
+  .messenger-sidebar { border-right: none; border-bottom: 1px solid var(--ueh-border); max-height: 240px; }
+}
+
+.messenger-sidebar {
+  border-right: 1px solid var(--ueh-border);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--ueh-border);
+}
+.sidebar-header h2 { font-size: 20px; font-weight: 800; color: var(--ueh-navy); }
+.chat-conversations-list { flex: 1; overflow-y: auto; }
+.conv-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; transition: 0.2s; border-left: 3px solid transparent;
+}
+.conv-item:hover { background: #f0f2f5; }
+.conv-item.active { background: #fff4ed; border-left-color: var(--ueh-orange); }
+.conv-avatar-wrap { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.conv-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.online-dot {
+  position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid #fff;
+}
+.conv-meta { flex: 1; overflow: hidden; }
+.conv-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+.conv-preview { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.messenger-chatbox {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  height: 100%;
+}
+.msg-chat-header {
+  padding: 12px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--ueh-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.msg-header-user { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.msg-header-user img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+.msg-header-title { font-size: 15px; font-weight: 700; color: var(--ueh-navy); }
+.msg-header-status { font-size: 11.5px; color: #16a34a; display: flex; align-items: center; gap: 4px; }
+.msg-header-status::before { content: ''; width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
+
+.msg-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8fafc;
+}
+.msg-bubble {
+  max-width: 65%; padding: 10px 15px; border-radius: 18px; font-size: 14px; line-height: 1.45; word-wrap: break-word;
+}
+.msg-bubble-in {
+  background: #ffffff; color: var(--text-main); align-self: flex-start; border: 1px solid var(--ueh-border); border-bottom-left-radius: 4px;
+}
+.msg-bubble-out {
+  background: var(--ueh-orange); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px;
+}
+.bubble-time { font-size: 10.5px; opacity: 0.7; margin-top: 4px; display: block; text-align: right; }
+
+.msg-quick-icebreakers {
+  padding: 8px 16px; background: #fff4ed; border-top: 1px solid #fed7aa; display: flex; gap: 8px; overflow-x: auto;
+}
+.msg-ice-chip {
+  white-space: nowrap; font-size: 12px; background: #fff; color: var(--ueh-navy); border: 1px solid #fdba74;
+  padding: 5px 12px; border-radius: 999px; cursor: pointer; transition: 0.2s;
+}
+.msg-ice-chip:hover { background: var(--ueh-orange); color: #fff; }
+
+.msg-input-area {
+  padding: 12px 16px; background: #ffffff; border-top: 1px solid var(--ueh-border); display: flex; gap: 10px; align-items: center;
+}
+.msg-input-area input {
+  flex: 1; padding: 12px 18px; background: #f0f2f5; border: none; border-radius: 24px; font-size: 14px; outline: none;
+}
+.btn-send-msg {
+  width: 42px; height: 42px; background: var(--ueh-navy); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+}
+.btn-send-msg:hover { background: var(--ueh-orange); }
+
+/* PROFILE VIEW */
+.fb-profile-container { background: var(--ueh-white); border-radius: 0 0 16px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.fb-cover-wrap { position: relative; height: 280px; border-radius: 12px 12px 0 0; overflow: hidden; background: #003b5c; }
+.fb-cover-img { width: 100%; height: 100%; object-fit: cover; }
+.btn-edit-cover { position: absolute; bottom: 16px; right: 16px; background: rgba(255,255,255,0.9); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; }
+.fb-header-details { position: relative; padding: 0 32px 20px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--ueh-border); }
+.fb-avatar-box { position: relative; margin-top: -80px; display: flex; align-items: flex-end; gap: 20px; }
+.fb-avatar-main { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--ueh-white); box-shadow: 0 4px 12px rgba(0,0,0,0.15); object-fit: cover; background: #fff; }
+.btn-change-avatar { position: absolute; bottom: 8px; right: 0; width: 36px; height: 36px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; }
+.fb-user-title h1 { font-size: 26px; font-weight: 800; color: var(--text-main); line-height: 1.2; }
+.fb-user-title p { font-size: 14px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+.fb-grid-layout { display: grid; grid-template-columns: 380px 1fr; gap: 16px; margin-top: 16px; }
+@media(max-width:850px){
+  .fb-header-details { flex-direction: column; align-items: center; text-align: center; }
+  .fb-avatar-box { flex-direction: column; align-items: center; margin-top: -60px; }
+  .fb-grid-layout { grid-template-columns: 1fr; }
+}
+
+.intro-item { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; margin-bottom: 14px; color: var(--text-main); }
+.intro-item i { font-size: 18px; color: var(--text-muted); width: 22px; margin-top: 3px; }
+
+/* BẢNG TIN */
+.fb-create-post { background: var(--ueh-white); border-radius: 12px; padding: 16px; border: 1px solid var(--ueh-border); margin-bottom: 16px; }
+.post-input-box { display: flex; gap: 12px; align-items: center; }
+.post-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.post-input-box textarea { flex: 1; background: #f0f2f5; border: none; border-radius: 20px; padding: 12px 16px; font-size: 14px; outline: none; resize: none; }
+
+.fb-post-card { background: var(--ueh-white); border-radius: 12px; border: 1px solid var(--ueh-border); padding: 18px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.03); }
+.post-user-info { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.clickable-user { cursor: pointer; }
+.clickable-user:hover { text-decoration: underline; color: var(--ueh-orange); }
+
+.post-actions { display: flex; gap: 8px; border-top: 1px solid var(--ueh-border); margin-top: 12px; padding-top: 8px; }
+.btn-post-action {
+  flex: 1; background: none; border: none; font-size: 13px; font-weight: 700; color: var(--text-muted);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 6px; transition: 0.2s;
+}
+.btn-post-action:hover { background: #f0f2f5; color: var(--ueh-navy); }
+
+.comment-section { display: none; border-top: 1px solid var(--ueh-border); margin-top: 12px; padding-top: 12px; }
+.comment-input-wrap { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.comment-input-wrap input { flex: 1; background: #f0f2f5; border: none; border-radius: 20px; padding: 8px 14px; font-size: 13px; outline: none; }
+.comment-list { display: flex; flex-direction: column; gap: 8px; }
+.comment-item { display: flex; gap: 8px; align-items: flex-start; }
+.comment-bubble { background: #f0f2f5; padding: 8px 12px; border-radius: 14px; font-size: 13px; }
+.comment-bubble b { font-size: 12.5px; color: var(--ueh-navy); display: block; margin-bottom: 2px; }
+
+/* TÌM BẠN HỌC */
+.match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;margin-top:20px}
+.match-card{
+  background:var(--ueh-white); border-radius:16px; border:1.5px solid var(--ueh-border); padding:22px;
+  display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 4px 16px rgba(0,59,92,0.05);
+}
+.match-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.match-score{background:#dcfce7;color:#15803d;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:800;border:1px solid #bbf7d0}
+.pill{display:inline-block;background:#f1f5f9;color:var(--ueh-navy);border-radius:6px;padding:3px 8px;font-size:12px;margin:2px;font-weight:600}
+.pill-badge{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+
+/* FORM VÀ INPUT */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.full{grid-column:1/-1}
+.group label{display:block;font-weight:700;font-size:13.5px;color:var(--ueh-navy);margin-bottom:6px}
+.field{width:100%;padding:11px 13px;border:1.5px solid var(--ueh-border);border-radius:10px;font-size:14px;background:#fff;outline:none;transition:border-color .2s}
+.field:focus{border-color:var(--ueh-orange)}
+optgroup{font-weight:bold;color:var(--ueh-navy);background:#f1f5f9}
+option{font-weight:normal;color:var(--text-main);background:#fff}
+
+footer{text-align:center;color:var(--text-muted);padding:35px 20px;font-size:13.5px;border-top:1px solid var(--ueh-border);margin-top:40px}
+</style>
+</head>
+<body>
+
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="handleImageUpload(event, 'avatar')">
+<input type="file" id="coverFileInput" accept="image/*" style="display:none" onchange="handleImageUpload(event, 'cover')">
+
+<!-- NAVBAR -->
+<header>
+  <div class="logo" onclick="switchView('sec-home')"><span>UEH</span> StudyMate</div>
+  <nav>
+    <span class="nav-link" onclick="switchView('sec-home')">Trang chủ</span>
+    <span class="nav-link" onclick="switchView('sec-senior')">Góc Senior</span>
+
+    <div class="nav-protected" id="navProtected">
+      <span class="nav-link" onclick="guardView('sec-feed')"><i class="fa-solid fa-newspaper"></i> Bảng tin</span>
+      <span class="nav-link" onclick="guardView('sec-results')"><i class="fa-solid fa-user-group"></i> Tìm bạn học</span>
+      <span class="nav-link" onclick="guardView('sec-messenger')">
+        <i class="fa-brands fa-facebook-messenger" style="color:var(--ueh-orange);font-size:16px"></i> Tin nhắn
+        <span class="msg-badge" id="msgNavBadge">2</span>
+      </span>
+    </div>
+
+    <div class="auth-guest" id="guestNav">
+      <button class="btn btn-outline" onclick="openAuthModal('login')">Đăng nhập</button>
+      <button class="btn btn-orange" onclick="openAuthModal('register')">Đăng ký (OTP)</button>
+    </div>
+
+    <div class="auth-user" id="userNav">
+      <div class="nav-profile-badge" onclick="viewMyOwnProfile()">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" id="navAvatarImg" class="nav-avatar-img">
+        <span class="nav-user-name" id="navUserName">Tuấn Phong</span>
+      </div>
+      <button class="btn btn-danger" style="padding:6px 12px;font-size:12.5px" onclick="handleLogout()">Đăng xuất</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. TRANG CHỦ -->
+  <section id="sec-home" class="view-section active">
+    <div style="background:linear-gradient(135deg, var(--ueh-navy) 0%, #03527e 100%);color:#fff;border-radius:24px;padding:56px 40px;display:grid;grid-template-columns:1.2fr 0.8fr;gap:32px;align-items:center;">
+      <div>
+        <h1 style="font-size:38px;line-height:1.2;margin-bottom:14px">Kết nối chuẩn gu - <br><span style="color:var(--ueh-orange)">Vững bước freshman</span></h1>
+        <p style="color:#dbeafe;margin-bottom:24px">Cộng đồng học tập độc quyền sinh viên Đại học Kinh tế TP.HCM. Bắt buộc xác thực tài khoản qua cổng Email sinh viên UEH.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-orange" style="padding:14px 28px;font-size:16px" onclick="guardView('sec-feed')">Vào Bảng Tin</button>
+          <button class="btn btn-outline" style="padding:14px 28px;font-size:16px;background:transparent;color:#fff;border-color:#fff" onclick="openAuthModal('register')">Tạo Tài Khoản (@st.ueh.edu.vn)</button>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);border-radius:18px;padding:26px;text-align:center;">
+        <span style="background:var(--ueh-orange);color:#fff;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;">Xác Thực Sinh Viên</span>
+        <h3 style="margin:10px 0 6px">100% Sinh Viên UEH</h3>
+        <p style="color:#dbeafe;font-size:13.5px">Hệ thống gửi mã OTP bảo mật về hòm thư sinh viên, đảm bảo môi trường học thuật văn minh và an toàn.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. BẢNG TIN SINH VIÊN -->
+  <section id="sec-feed" class="view-section">
+    <div style="max-width:680px;margin:0 auto">
+      <div class="card" style="margin-bottom:16px;padding:16px 20px">
+        <h2 style="font-size:20px;color:var(--ueh-navy);margin-bottom:4px"><i class="fa-solid fa-bullhorn" style="color:var(--ueh-orange)"></i> Bảng Tin Sinh Viên UEH</h2>
+        <p style="font-size:13px;color:var(--text-muted)">Bấm vào Tên/Avatar để xem profile, hoặc bấm Nhắn tin để trò chuyện qua Messenger.</p>
+      </div>
+
+      <div class="fb-create-post">
+        <div class="post-input-box">
+          <img id="feedUserAvatar" class="post-avatar clickable-user" onclick="viewMyOwnProfile()" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100">
+          <textarea id="feedPostInput" rows="2" placeholder="Bạn cần tìm bạn học môn gì hay muốn chia sẻ tài liệu?"></textarea>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <small style="color:var(--text-muted);font-size:12px">🌐 Đăng công khai lên Bảng tin</small>
+          <button class="btn btn-orange" onclick="postToPublicFeed()"><i class="fa-solid fa-paper-plane"></i> Đăng bài</button>
+        </div>
+      </div>
+
+      <div id="publicFeedContainer"></div>
+    </div>
+  </section>
+
+  <!-- 3. MESSENGER CHUẨN FACEBOOK -->
+  <section id="sec-messenger" class="view-section">
+    <div class="messenger-container">
+      <div class="messenger-sidebar">
+        <div class="sidebar-header">
+          <h2>Đoạn chat</h2>
+        </div>
+        <div class="chat-conversations-list" id="convListContainer"></div>
+      </div>
+
+      <div class="messenger-chatbox">
+        <div class="msg-chat-header">
+          <div class="msg-header-user" onclick="openProfileFromChat()">
+            <img id="msgActiveAvatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100">
+            <div>
+              <div class="msg-header-title" id="msgActiveName">Nguyễn Minh Anh</div>
+              <div class="msg-header-status" id="msgActiveStatus">Đang online</div>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-outline" style="padding:6px 14px;font-size:13px" onclick="openProfileFromChat()"><i class="fa-solid fa-user"></i> Xem trang cá nhân</button>
+          </div>
+        </div>
+
+        <div class="msg-quick-icebreakers">
+          <span style="font-size:11px;font-weight:700;color:var(--ueh-orange);align-self:center">Gợi ý câu chào:</span>
+          <span class="msg-ice-chip" onclick="sendQuickMsg('Chào bạn nha! Rất vui được quen bạn!')">👋 Chào bạn nha!</span>
+          <span class="msg-ice-chip" onclick="sendQuickMsg('Kỳ này chúng mình cùng học chung nhé?')">🤝 Cùng học nhé?</span>
+          <span class="msg-ice-chip" onclick="sendQuickMsg('Hôm nào rảnh cùng lên thư viện B1 học nhé!')">📖 Hẹn lên Thư viện B1</span>
+        </div>
+
+        <div class="msg-body" id="msgBodyContainer"></div>
+
+        <div class="msg-input-area">
+          <input type="text" id="msgMainInput" placeholder="Nhập tin nhắn..." onkeypress="if(event.key==='Enter') sendMainMessage()">
+          <button class="btn-send-msg" onclick="sendMainMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. TRANG PROFILE CÁ NHÂN -->
+  <section id="sec-profile-view" class="view-section">
+    <div class="fb-profile-container">
+      <div class="fb-cover-wrap">
+        <!-- ĐÃ ĐẶT ẢNH BÌA THEO CODE GỐC CỦA BẠN -->
+        <img id="profileViewCover" class="fb-cover-img" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200">
+        <button class="btn btn-edit-cover" id="btnEditCover" onclick="document.getElementById('coverFileInput').click()">
+          <i class="fa-solid fa-camera"></i> Chỉnh sửa ảnh bìa
+        </button>
+      </div>
+
+      <div class="fb-header-details">
+        <div class="fb-avatar-box">
+          <div style="position:relative">
+            <img id="profileViewAvatar" class="fb-avatar-main" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400">
+            <div class="btn-change-avatar" id="btnEditAvatar" onclick="document.getElementById('avatarFileInput').click()">
+              <i class="fa-solid fa-camera" style="font-size:15px;color:#050505"></i>
+            </div>
+          </div>
+          <div class="fb-user-title">
+            <h1 id="profileViewName">Tuấn Phong</h1>
+            <p id="profileViewSub">Marketing · Khóa K52 UEH</p>
+          </div>
+        </div>
+
+        <div id="profileActionBtns" style="display:flex;gap:8px;margin-top:16px"></div>
+      </div>
+    </div>
+
+    <div class="fb-grid-layout">
+      <div>
+        <div class="card">
+          <h3 style="font-size:18px;margin-bottom:14px;color:var(--ueh-navy)">Giới thiệu bản thân</h3>
+          <p id="profileViewBio" style="font-style:italic;color:var(--text-muted);font-size:13.5px;margin-bottom:16px;background:#f0f2f5;padding:10px;border-radius:8px">
+            "Lời giới thiệu..."
+          </p>
+
+          <div class="intro-item">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <div>Sinh viên ngành <b id="profileViewMajor">Marketing</b> tại <b>UEH</b></div>
+          </div>
+          <div class="intro-item">
+            <i class="fa-solid fa-clock"></i>
+            <div>Thời gian & Không gian: <span id="profileViewLiving">Thư viện B1</span></div>
+          </div>
+          <div class="intro-item">
+            <i class="fa-solid fa-bullseye"></i>
+            <div>Mục tiêu: <b id="profileViewGoal" style="color:var(--ueh-orange)">Săn điểm A</b></div>
+          </div>
+          <div class="intro-item">
+            <i class="fa-solid fa-handshake-angle"></i>
+            <div>Phương thức phối hợp: <span id="profileViewStyle">Silent Pomodoro</span></div>
+          </div>
+
+          <button class="btn btn-gray" id="btnEditDetails" style="width:100%;margin-top:8px" onclick="guardView('sec-edit-profile')">Chỉnh sửa chi tiết</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="fb-create-post" id="profilePostCreateBox">
+          <div class="post-input-box">
+            <img id="profileMyMiniAvatar" class="post-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100">
+            <textarea id="profilePostInput" rows="2" placeholder="Bạn muốn chia sẻ điều gì lên trang cá nhân?"></textarea>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <button class="btn btn-orange" onclick="postToCurrentWall()"><i class="fa-solid fa-pen-to-square"></i> Đăng lên tường</button>
+          </div>
+        </div>
+
+        <div id="profileTimelineContainer"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. XÁC THỰC EMAIL & ĐĂNG NHẬP (CÓ OTP BẮT BUỘC EMAIL UEH) -->
+  <section id="sec-auth" class="view-section">
+    <!-- BANNER TEST OTP TỰ ĐỘNG -->
+    <div id="otpSimBanner" class="otp-simulator-banner" style="display:none;max-width:480px;margin:0 auto 16px;">
+      <div>
+        <div style="font-size:12px;color:#4f46e5;font-weight:700">📬 UEH Mail Server Simulator:</div>
+        <div style="font-size:13px;color:#1e1b4b">Mã OTP gửi đến email của bạn là: <span id="simOtpCode" class="otp-code-box">000000</span></div>
+      </div>
+      <button class="btn btn-orange" style="padding:6px 12px;font-size:12px" onclick="autoFillOtp()">Điền nhanh</button>
+    </div>
+
+    <!-- KHUNG ĐĂNG NHẬP -->
+    <div class="card" id="boxLogin" style="max-width:440px;margin:0 auto">
+      <h2 style="color:var(--ueh-navy);text-align:center;margin-bottom:6px">Đăng nhập StudyMate</h2>
+      <p style="text-align:center;color:var(--text-muted);font-size:13.5px;margin-bottom:18px">Đăng nhập tài khoản sinh viên UEH.</p>
+      <div class="group">
+        <label>Email sinh viên UEH (@st.ueh.edu.vn)</label>
+        <input class="field" type="email" id="loginEmail" placeholder="tuanphong.k52@st.ueh.edu.vn" value="tuanphong.k52@st.ueh.edu.vn">
+      </div>
+      <div class="group" style="margin-top:12px">
+        <label>Mật khẩu</label>
+        <input class="field" type="password" id="loginPass" value="12345678">
+      </div>
+      <button class="btn btn-orange" style="width:100%;margin-top:18px" onclick="handleLogin()">Đăng nhập</button>
+      <div style="text-align:center;margin-top:14px;font-size:13px">
+        Chưa có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthMode('register')" style="color:var(--ueh-orange);font-weight:700">Đăng ký bằng Email UEH</a>
+      </div>
+    </div>
+
+    <!-- KHUNG ĐĂNG KÝ BẮT BUỘC EMAIL UEH & OTP -->
+    <div class="card" id="boxRegister" style="max-width:540px;margin:0 auto;display:none">
+      <h2 style="color:var(--ueh-navy);text-align:center;margin-bottom:4px">Đăng Ký Tài Khoản UEH</h2>
+      <p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px">Bắt buộc xác thực email <code>@st.ueh.edu.vn</code> nhận mã OTP</p>
+
+      <div id="stepEmailForm">
+        <div class="group">
+          <label>Họ và tên của bạn</label>
+          <input class="field" id="regName" placeholder="Ví dụ: Trương Tuấn Phong">
+        </div>
+        <div class="group" style="margin-top:10px">
+          <label>Email sinh viên UEH (Bắt buộc đuôi @st.ueh.edu.vn)</label>
+          <input class="field" type="email" id="regEmail" placeholder="phongtt.k52@st.ueh.edu.vn">
+        </div>
+        <div class="group" style="margin-top:10px">
+          <label>Mật khẩu</label>
+          <input class="field" type="password" id="regPass" placeholder="Tối thiểu 6 ký tự">
+        </div>
+        <div class="group" style="margin-top:10px">
+          <label>Ngành đào tạo UEH</label>
+          <select class="field" id="regMajor">
+            <optgroup label="TRƯỜNG KINH DOANH (COB)">
+              <option>Marketing</option>
+              <option>Quản trị kinh doanh</option>
+              <option>Kinh doanh quốc tế</option>
+              <option>Tài chính doanh nghiệp</option>
+              <option>Ngân hàng</option>
+              <option>Kế toán doanh nghiệp</option>
+              <option>Logistics và Quản lý chuỗi cung ứng</option>
+            </optgroup>
+            <optgroup label="TRƯỜNG KINH TẾ, LUẬT & QUẢN LÝ (CELG)">
+              <option>Kinh tế học</option>
+              <option>Kinh tế đầu tư</option>
+              <option>Luật kinh tế</option>
+              <option>Quản trị công</option>
+            </optgroup>
+            <optgroup label="TRƯỜNG CÔNG NGHỆ VÀ THIẾT KẾ (CTD)">
+              <option>Công nghệ thông tin</option>
+              <option>Khoa học dữ liệu</option>
+              <option>Công nghệ tài chính (Fintech)</option>
+              <option>Thiết kế truyền thông số</option>
+            </optgroup>
+          </select>
+        </div>
+        <button class="btn btn-orange" style="width:100%;margin-top:16px" onclick="requestOtpRegistration()">
+          <i class="fa-solid fa-paper-plane"></i> Gửi mã OTP xác nhận
+        </button>
+      </div>
+
+      <!-- BƯỚC NHẬP MÃ OTP -->
+      <div id="stepOtpForm" style="display:none;margin-top:12px;background:#f8fafc;padding:16px;border-radius:10px;border:1px solid var(--ueh-border)">
+        <div style="font-size:13.5px;color:var(--ueh-navy);font-weight:700;margin-bottom:6px">Nhập mã OTP 6 số đã được gửi tới email của bạn:</div>
+        <input class="field" id="regOtpInput" placeholder="Nhập 6 số OTP..." maxlength="6" style="text-align:center;font-size:18px;letter-spacing:4px;font-weight:800">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <span style="font-size:12px;color:var(--text-muted)" id="otpTimerLabel">Mã hết hạn sau: 60s</span>
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:12px" onclick="resendOtp()">Gửi lại OTP</button>
+        </div>
+        <button class="btn btn-orange" style="width:100%;margin-top:14px" onclick="verifyOtpAndRegister()">
+          <i class="fa-solid fa-shield-check"></i> Xác nhận OTP & Hoàn tất đăng ký
+        </button>
+      </div>
+
+      <div style="text-align:center;margin-top:14px;font-size:13px">
+        Đã có tài khoản? <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color:var(--ueh-orange);font-weight:700">Đăng nhập</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. CHỈNH SỬA PROFILE -->
+  <section id="sec-edit-profile" class="view-section">
+    <div class="card">
+      <h2 style="color:var(--ueh-navy);font-size:24px;margin-bottom:4px">Chỉnh Sửa Hồ Sơ Cá Nhân</h2>
+      <p style="color:var(--text-muted);font-size:14px">Thông tin hiển thị trên trang cá nhân và thẻ gợi ý kết nối của bạn.</p>
+
+      <div class="grid">
+        <div class="group">
+          <label>Tên hiển thị</label>
+          <input class="field" id="profName" value="Tuấn Phong">
+        </div>
+        <div class="group">
+          <label>Khóa học</label>
+          <input class="field" id="profYear" value="Khóa K52 (Freshman 2026)">
+        </div>
+
+        <div class="group full">
+          <label>Ngành / Chương trình đào tạo UEH</label>
+          <select class="field" id="profMajor">
+            <optgroup label="TRƯỜNG KINH DOANH (COB)">
+              <option selected>Marketing</option>
+              <option>Quản trị kinh doanh</option>
+              <option>Kinh doanh quốc tế</option>
+              <option>Tài chính doanh nghiệp</option>
+              <option>Ngân hàng</option>
+              <option>Kế toán doanh nghiệp</option>
+              <option>Logistics và Quản lý chuỗi cung ứng</option>
+            </optgroup>
+            <optgroup label="TRƯỜNG KINH TẾ, LUẬT & QUẢN LÝ (CELG)">
+              <option>Kinh tế học</option>
+              <option>Kinh tế đầu tư</option>
+              <option>Luật kinh tế</option>
+              <option>Quản trị công</option>
+            </optgroup>
+            <optgroup label="TRƯỜNG CÔNG NGHỆ VÀ THIẾT KẾ (CTD)">
+              <option>Công nghệ thông tin</option>
+              <option>Khoa học dữ liệu</option>
+              <option>Công nghệ tài chính (Fintech)</option>
+              <option>Thiết kế truyền thông số</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="group">
+          <label>Không gian & Khung giờ học tập</label>
+          <select class="field" id="profLiving">
+            <option selected>Khu vực Cơ sở A, B, N • Tự học tại thư viện B1 ban ngày</option>
+            <option>Khu vực Cơ sở B, H, E • Rảnh các buổi chiều sau giờ học</option>
+            <option>Ưu tiên làm việc Online qua Google Meet / Discord</option>
+          </select>
+        </div>
+
+        <div class="group">
+          <label>Phong cách học tập & Phối hợp nhóm</label>
+          <select class="field" id="profStyle">
+            <option selected>Học im lặng (Silent Pomodoro), trao đổi qua tin nhắn</option>
+            <option>Thích thảo luận trực tiếp, phản biện & phân tích case study</option>
+            <option>Phân chia việc theo deadline rõ ràng, làm việc độc lập</option>
+          </select>
+        </div>
+
+        <div class="group full">
+          <label>Mục tiêu học tập</label>
+          <select class="field" id="profGoal">
+            <option selected>Săn điểm A / Học bổng khuyến khích UEH</option>
+            <option>Đạt điểm khá - giỏi (GPA 3.2+)</option>
+            <option>Cần bạn cùng qua môn an toàn</option>
+          </select>
+        </div>
+
+        <div class="group full">
+          <label>Tiểu sử (Bio giới thiệu bản thân)</label>
+          <textarea class="field" id="profBio" rows="2">Mình là người hướng nội nên ít khi nói chuyện trước, rất vui được cùng ngồi học thư viện và nhắc nhở nhau làm bài đúng hạn!</textarea>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;display:flex;gap:10px">
+        <button class="btn btn-orange" style="flex:1;padding:12px" onclick="handleSaveProfile()">Lưu & Cập nhật Profile</button>
+        <button class="btn btn-outline" style="padding:12px 20px" onclick="viewMyOwnProfile()">Hủy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. TÌM BẠN HỌC -->
+  <section id="sec-results" class="view-section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h2 style="color:var(--ueh-navy);font-size:24px">StudyMate Tương Thích Nhất</h2>
+        <p style="color:var(--text-muted);font-size:14px">Được xếp hạng tự động dựa trên ngành, mục tiêu GPA và phương thức phối hợp.</p>
+      </div>
+      <button class="btn btn-outline" onclick="viewMyOwnProfile()">Xem trang cá nhân của bạn</button>
+    </div>
+    <div class="match-grid" id="matchGridContainer"></div>
+  </section>
+
+  <!-- GÓC SENIOR -->
+  <section id="sec-senior" class="view-section">
+    <div class="card" style="text-align:center;padding:48px 20px">
+      <h2 style="color:var(--ueh-navy);margin-bottom:10px"><i class="fa-solid fa-graduation-cap"></i> Góc Senior UEH</h2>
+      <p style="color:var(--text-muted);max-width:540px;margin:0 auto 20px">Kinh nghiệm học tín chỉ, mẹo làm việc nhóm và phương pháp săn học bổng từ anh chị khóa trên.</p>
+      <button class="btn btn-orange" onclick="guardView('sec-feed')">Vào Bảng Tin Sinh Viên</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Đại học Kinh tế TP. Hồ Chí Minh · Đồ án Design Thinking · UEH StudyMate 2026
+</footer>
+
+<script>
+const userDatabase = {
+  "Nguyễn Minh Anh": {
+    name: "Nguyễn Minh Anh",
+    major: "Marketing",
+    year: "Khóa K52",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    cover: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200",
+    goal: "Săn điểm A / Học bổng khuyến khích",
+    style: "Thiết kế trực quan: vẽ Mindmap, làm Slide Canva/PowerPoint",
+    living: "Khu vực Cơ sở A, B, N • Tự học tại thư viện B1 ban ngày",
+    bio: "Mình thích học theo phương pháp trực quan, đang tìm bạn cùng ngồi học tại Thư viện B1 và ôn tập trắc nghiệm.",
+    match: "96% Phù hợp"
+  },
+  "Trần Gia Huy": {
+    name: "Trần Gia Huy",
+    major: "Tài chính doanh nghiệp",
+    year: "Khóa K51",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+    cover: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200",
+    goal: "Săn học bổng khuyến khích (GPA 3.6+)",
+    style: "Thực hành cày đề thi trắc nghiệm & giải bài tập định lượng",
+    living: "Khu vực Cơ sở B, H, E • Rảnh các buổi chiều sau giờ học",
+    bio: "Mình có sẵn kho đề thi các năm, tìm bạn cùng trao đổi bài tập và nhắc nộp bài đúng hạn.",
+    match: "92% Phù hợp"
+  }
+};
+
+let messengerThreads = {
+  "Nguyễn Minh Anh": [
+    { type: "in", text: "Chào bạn nha! Rất vui được kết nối với bạn trên StudyMate!", time: "09:30" },
+    { type: "out", text: "Chào Minh Anh! Kỳ này mình cùng lên Thư viện B1 học nhé?", time: "09:32" },
+    { type: "in", text: "Oke bạn ơi, chiều mai bạn có rảnh không mình hẹn nhau ở lầu 2 nha!", time: "09:35" }
+  ],
+  "Trần Gia Huy": [
+    { type: "in", text: "Chào bạn! Mình thấy bạn cũng có mục tiêu học bổng kỳ này, có cần tài liệu trắc nghiệm không mình gửi nhé?", time: "Hôm qua" }
+  ]
+};
+
+let activeChatUser = "Nguyễn Minh Anh";
+
+let publicFeed = [
+  {
+    id: "post_1",
+    authorName: "Nguyễn Minh Anh",
+    authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+    authorMajor: "Marketing · K52",
+    content: "Chào mọi người! Kỳ này mình đang nhắm mục tiêu học bổng khuyến khích. Bạn nào hay ngồi tự học yên tĩnh tại Thư viện B1 thì kết nối cùng mình nhé! 🤝",
+    time: "2 giờ trước",
+    likes: 6,
+    comments: [{ name: "Trần Gia Huy", text: "Mình cũng hay ngồi B1 buổi sáng nè!" }]
+  },
+  {
+    id: "post_2",
+    authorName: "Trần Gia Huy",
+    authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
+    authorMajor: "Tài chính doanh nghiệp · K51",
+    content: "Mình có tổng hợp sẵn bộ câu hỏi trắc nghiệm ôn tập các kỳ trước, bạn nào cần tham khảo hoặc cùng giải đề thì nhắn tin mình qua StudyMate nha!",
+    time: "5 giờ trước",
+    likes: 14,
+    comments: []
+  }
+];
+
+// BIẾN QUẢN LÝ OTP
+let currentOtpCode = "";
+let otpCountdownTimer = null;
+let otpTimeLeft = 60;
+let tempRegisterData = null;
+
+function switchView(targetSectionId) {
+  document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+  const target = document.getElementById(targetSectionId);
+  if (target) target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function guardView(targetSectionId) {
+  const session = localStorage.getItem("ueh_user_session");
+  if (!session) {
+    alert("🔒 Vui lòng đăng nhập để sử dụng tính năng nội bộ!");
+    openAuthModal('login');
+    return;
+  }
+  switchView(targetSectionId);
+  if (targetSectionId === 'sec-messenger') renderMessenger();
+}
+
+function openAuthModal(mode) {
+  switchView('sec-auth');
+  toggleAuthMode(mode);
+}
+
+function toggleAuthMode(mode) {
+  const boxLogin = document.getElementById('boxLogin');
+  const boxRegister = document.getElementById('boxRegister');
+  const simBanner = document.getElementById('otpSimBanner');
+
+  if (mode === 'register') {
+    boxLogin.style.display = 'none';
+    boxRegister.style.display = 'block';
+    document.getElementById('stepEmailForm').style.display = 'block';
+    document.getElementById('stepOtpForm').style.display = 'none';
+  } else {
+    boxLogin.style.display = 'block';
+    boxRegister.style.display = 'none';
+    simBanner.style.display = 'none';
+  }
+}
+
+// ========================================================
+// LOGIC OTP BẮT BUỘC EMAIL UEH
+// ========================================================
+function isValidUehEmail(email) {
+  const cleanEmail = email.trim().toLowerCase();
+  return cleanEmail.endsWith('@st.ueh.edu.vn') || cleanEmail.endsWith('@ueh.edu.vn');
+}
+
+function requestOtpRegistration() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value.trim();
+  const major = document.getElementById('regMajor').value;
+
+  if (!name) return alert("Vui lòng nhập họ và tên của bạn!");
+  if (!email) return alert("Vui lòng nhập Email sinh viên UEH!");
+  if (!isValidUehEmail(email)) {
+    return alert("⚠️ Email không hợp lệ!\nBắt buộc phải sử dụng email sinh viên có đuôi @st.ueh.edu.vn (hoặc @ueh.edu.vn)");
+  }
+  if (pass.length < 6) return alert("Mật khẩu phải có ít nhất 6 ký tự!");
+
+  tempRegisterData = { name, email, pass, major };
+
+  // Tạo mã OTP 6 số
+  currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  // Hiển thị khung giả lập hòm thư UEH
+  document.getElementById('simOtpCode').innerText = currentOtpCode;
+  document.getElementById('otpSimBanner').style.display = 'flex';
+
+  document.getElementById('stepEmailForm').style.display = 'none';
+  document.getElementById('stepOtpForm').style.display = 'block';
+
+  startOtpTimer();
+  alert(Đã gửi mã xác nhận OTP đến ${email}!\n(Hãy xem hộp mô phỏng trên màn hình để lấy mã));
+}
+
+function startOtpTimer() {
+  clearInterval(otpCountdownTimer);
+  otpTimeLeft = 60;
+  const label = document.getElementById('otpTimerLabel');
+  label.innerText = Mã hết hạn sau: ${otpTimeLeft}s;
+
+  otpCountdownTimer = setInterval(() => {
+    otpTimeLeft--;
+    if (otpTimeLeft <= 0) {
+      clearInterval(otpCountdownTimer);
+      label.innerText = "Mã OTP đã hết hạn!";
+      currentOtpCode = "";
+    } else {
+      label.innerText = Mã hết hạn sau: ${otpTimeLeft}s;
+    }
+  }, 1000);
+}
+
+function autoFillOtp() {
+  if (currentOtpCode) {
+    document.getElementById('regOtpInput').value = currentOtpCode;
+  }
+}
+
+function resendOtp() {
+  if (!tempRegisterData) return;
+  currentOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  document.getElementById('simOtpCode').innerText = currentOtpCode;
+  document.getElementById('otpSimBanner').style.display = 'flex';
+  startOtpTimer();
+  alert("Mã OTP mới đã được gửi lại vào email sinh viên!");
+}
+
+function verifyOtpAndRegister() {
+  const enteredOtp = document.getElementById('regOtpInput').value.trim();
+  if (!enteredOtp) return alert("Vui lòng nhập mã OTP gồm 6 chữ số!");
+  if (enteredOtp !== currentOtpCode) {
+    return alert("❌ Mã OTP không chính xác hoặc đã hết hạn. Vui lòng kiểm tra lại!");
+  }
+
+  clearInterval(otpCountdownTimer);
+
+  // Tạo hồ sơ người dùng
+  const newUser = {
+    name: tempRegisterData.name,
+    email: tempRegisterData.email,
+    major: tempRegisterData.major,
+    year: "Khóa K52 (Freshman 2026)",
+    living: "Khu vực Cơ sở A, B, N • Tự học tại thư viện B1 ban ngày",
+    style: "Học im lặng (Silent Pomodoro), trao đổi qua tin nhắn",
+    goal: "Săn điểm A / Học bổng khuyến khích UEH",
+    bio: Xin chào! Mình là sinh viên ngành ${tempRegisterData.major}, rất vui được kết nối cùng các bạn UEH.,
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+    cover: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200"
+  };
+
+  localStorage.setItem("ueh_user_session", JSON.stringify(newUser));
+  document.getElementById('otpSimBanner').style.display = 'none';
+  updateUI();
+  alert("🎉 Xác thực Email UEH thành công! Chào mừng bạn gia nhập UEH StudyMate.");
+  switchView('sec-feed');
+}
+
+// ========================================================
+// LOGIC MESSENGER: CHỈ CÓ KHUNG CHAT, TỰ ĐỘNG CUỘN
+// ========================================================
+function renderMessenger() {
+  const listContainer = document.getElementById("convListContainer");
+  if (!listContainer) return;
+  listContainer.innerHTML = "";
+
+  if (!activeChatUser || !messengerThreads[activeChatUser]) {
+    activeChatUser = Object.keys(messengerThreads)[0] || "Nguyễn Minh Anh";
+  }
+
+  Object.keys(messengerThreads).forEach(name => {
+    const user = userDatabase[name] || {
+      name: name,
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100"
+    };
+    const msgs = messengerThreads[name] || [];
+    const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1].text : "Chưa có tin nhắn";
+    const isActive = (name === activeChatUser);
+
+    const item = document.createElement("div");
+    item.className = conv-item ${isActive ? 'active' : ''};
+    item.onclick = () => selectChatUser(name);
+    item.innerHTML = `
+      <div class="conv-avatar-wrap">
+        <img class="conv-avatar" src="${user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}">
+        <span class="online-dot"></span>
+      </div>
+      <div class="conv-meta">
+        <div class="conv-name">${name}</div>
+        <div class="conv-preview">${lastMsg}</div>
+      </div>
+    `;
+    listContainer.appendChild(item);
+  });
+
+  const activeUserObj = userDatabase[activeChatUser] || {
+    name: activeChatUser,
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+    living: "Thư viện B1"
+  };
+
+  document.getElementById("msgActiveName").innerText = activeUserObj.name;
+  document.getElementById("msgActiveAvatar").src = activeUserObj.avatar;
+  document.getElementById("msgActiveStatus").innerText = Đang online • ${activeUserObj.living || 'UEH'};
+
+  const bodyContainer = document.getElementById("msgBodyContainer");
+  bodyContainer.innerHTML = "";
+
+  const currentMsgs = messengerThreads[activeChatUser] || [];
+  currentMsgs.forEach(m => {
+    const bubble = document.createElement("div");
+    bubble.className = msg-bubble ${m.type === 'out' ? 'msg-bubble-out' : 'msg-bubble-in'};
+    bubble.innerHTML = ${m.text} <span class="bubble-time">${m.time || ''}</span>;
+    bodyContainer.appendChild(bubble);
+  });
+
+  setTimeout(() => {
+    bodyContainer.scrollTop = bodyContainer.scrollHeight;
+  }, 30);
+}
+
+function selectChatUser(name) {
+  activeChatUser = name;
+  renderMessenger();
+}
+
+function navigateToMessengerWith(userName, userAvatar) {
+  if (!messengerThreads[userName]) {
+    messengerThreads[userName] = [
+      { type: "in", text: "Chào bạn nha! Rất vui được kết nối qua UEH StudyMate!", time: "Vừa xong" }
+    ];
+  }
+  if (!userDatabase[userName]) {
+    userDatabase[userName] = {
+      name: userName,
+      avatar: userAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+      major: "Sinh viên UEH",
+      year: "Khóa K52",
+      living: "Thư viện B1",
+      goal: "Săn điểm A",
+      style: "Học nhóm trao đổi"
+    };
+  }
+
+  activeChatUser = userName;
+  guardView('sec-messenger');
+}
+
+function sendMainMessage() {
+  const input = document.getElementById("msgMainInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!messengerThreads[activeChatUser]) {
+    messengerThreads[activeChatUser] = [];
+  }
+
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  messengerThreads[activeChatUser].push({ type: "out", text, time });
+  input.value = "";
+  renderMessenger();
+
+  setTimeout(() => {
+    const replies = [
+      "Oke bạn nha! Chiều mai mình gặp nhau ở B1 nhé!",
+      "Mình nhận được tin nhắn rồi, cùng cố gắng qua môn kỳ này nha!",
+      "Nhất trí bạn ơi, có gì cùng trao đổi tiếp nhé!"
+    ];
+    const replyText = replies[Math.floor(Math.random() * replies.length)];
+    const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messengerThreads[activeChatUser].push({ type: "in", text: replyText, time: replyTime });
+    renderMessenger();
+  }, 1000);
+}
+
+function sendQuickMsg(text) {
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (!messengerThreads[activeChatUser]) {
+    messengerThreads[activeChatUser] = [];
+  }
+  messengerThreads[activeChatUser].push({ type: "out", text, time });
+  renderMessenger();
+
+  setTimeout(() => {
+    const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    messengerThreads[activeChatUser].push({
+      type: "in",
+      text: "Chào bạn nha! Rất vui được quen bạn!",
+      time: replyTime
+    });
+    renderMessenger();
+  }, 800);
+}
+
+function openProfileFromChat() {
+  openUserProfile(activeChatUser);
+}
+
+// ========================================================
+// PROFILE CÁ NHÂN
+// ========================================================
+function openUserProfile(userName) {
+  const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  const isMe = (userName === session.name);
+
+  let targetUser = isMe ? session : (userDatabase[userName] || {
+    name: userName,
+    major: "Sinh viên UEH",
+    year: "Khóa K52",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+    cover: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200",
+    goal: "Học tập nghiêm túc",
+    style: "Học nhóm & Trao đổi",
+    living: "Cơ sở TP.HCM",
+    bio: "Rất vui được kết nối cùng các bạn UEH!"
+  });
+
+  document.getElementById("profileViewName").innerText = targetUser.name;
+  document.getElementById("profileViewSub").innerText = ${targetUser.major} · ${targetUser.year};
+  document.getElementById("profileViewBio").innerText = "${targetUser.bio || 'Chưa cập nhật tiểu sử'}";
+  document.getElementById("profileViewMajor").innerText = targetUser.major;
+  document.getElementById("profileViewLiving").innerText = targetUser.living;
+  document.getElementById("profileViewGoal").innerText = targetUser.goal;
+  document.getElementById("profileViewStyle").innerText = targetUser.style;
+  document.getElementById("profileViewAvatar").src = targetUser.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400";
+  document.getElementById("profileViewCover").src = targetUser.cover || "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200";
+
+  const actionBtns = document.getElementById("profileActionBtns");
+  const btnEditCover = document.getElementById("btnEditCover");
+  const btnEditAvatar = document.getElementById("btnEditAvatar");
+  const btnEditDetails = document.getElementById("btnEditDetails");
+  const postCreateBox = document.getElementById("profilePostCreateBox");
+
+  if (isMe) {
+    btnEditCover.style.display = "block";
+    btnEditAvatar.style.display = "flex";
+    btnEditDetails.style.display = "block";
+    postCreateBox.style.display = "block";
+    actionBtns.innerHTML = `
+      <button class="btn btn-orange" onclick="guardView('sec-results')"><i class="fa-solid fa-user-group"></i> Tìm bạn học</button>
+      <button class="btn btn-gray" onclick="guardView('sec-edit-profile')"><i class="fa-solid fa-pen"></i> Chỉnh sửa hồ sơ</button>
+    `;
+  } else {
+    btnEditCover.style.display = "none";
+    btnEditAvatar.style.display = "none";
+    btnEditDetails.style.display = "none";
+    postCreateBox.style.display = "none";
+    actionBtns.innerHTML = `
+      <button class="btn btn-orange" onclick="navigateToMessengerWith('${targetUser.name}', '${targetUser.avatar}')"><i class="fa-brands fa-facebook-messenger"></i> Nhắn tin</button>
+      <button class="btn btn-outline" onclick="alert('Đã gửi lời mời học chung tới ${targetUser.name}!')"><i class="fa-solid fa-user-plus"></i> Gửi lời mời học</button>
+    `;
+  }
+
+  renderUserTimelinePosts(targetUser.name);
+  guardView("sec-profile-view");
+}
+
+function viewMyOwnProfile() {
+  const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  openUserProfile(session.name || "Tuấn Phong");
+}
+
+function renderUserTimelinePosts(authorName) {
+  const container = document.getElementById("profileTimelineContainer");
+  container.innerHTML = "";
+  const userPosts = publicFeed.filter(p => p.authorName === authorName);
+
+  if (userPosts.length === 0) {
+    container.innerHTML = `
+      <div class="card" style="text-align:center;padding:30px;color:var(--text-muted)">
+        <i class="fa-solid fa-folder-open" style="font-size:26px;margin-bottom:8px"></i>
+        <p>${authorName} chưa có bài viết nào trên trang cá nhân.</p>
+      </div>
+    `;
+    return;
+  }
+
+  userPosts.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "fb-post-card";
+    card.innerHTML = `
+      <div class="post-user-info">
+        <img class="post-avatar" src="${post.authorAvatar}">
+        <div>
+          <b style="font-size:14px">${post.authorName}</b>
+          <div style="font-size:11.5px;color:var(--text-muted)">${post.time} · 🌐 Công khai</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#050505;line-height:1.5">${post.content}</p>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ========================================================
+// BẢNG TIN VÀ BÌNH LUẬN
+// ========================================================
+function renderPublicFeed() {
+  const container = document.getElementById("publicFeedContainer");
+  if (!container) return;
+  container.innerHTML = "";
+
+  publicFeed.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "fb-post-card";
+    
+    const commentsHtml = post.comments.map(c => `
+      <div class="comment-item">
+        <div class="comment-bubble">
+          <b class="clickable-user" onclick="openUserProfile('${c.name}')">${c.name}</b>
+          ${c.text}
+        </div>
+      </div>
+    `).join("");
+
+    card.innerHTML = `
+      <div class="post-user-info">
+        <img class="post-avatar clickable-user" onclick="openUserProfile('${post.authorName}')" src="${post.authorAvatar}">
+        <div>
+          <b style="font-size:14px" class="clickable-user" onclick="openUserProfile('${post.authorName}')">${post.authorName}</b>
+          <div style="font-size:11.5px;color:var(--text-muted)">${post.authorMajor} · ${post.time} · 🌐 Công khai</div>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#050505;line-height:1.5">${post.content}</p>
+      
+      <div class="post-actions">
+        <button class="btn-post-action" onclick="this.style.color='#e85d04'"><i class="fa-regular fa-heart"></i> Thích (${post.likes})</button>
+        <button class="btn-post-action" onclick="toggleCommentBox('${post.id}')"><i class="fa-regular fa-comment"></i> Bình luận (${post.comments.length})</button>
+        <button class="btn-post-action" onclick="navigateToMessengerWith('${post.authorName}', '${post.authorAvatar}')"><i class="fa-brands fa-facebook-messenger"></i> Nhắn tin</button>
+      </div>
+
+      <div class="comment-section" id="comment-box-${post.id}">
+        <div class="comment-input-wrap">
+          <input type="text" id="input-${post.id}" placeholder="Viết bình luận công khai..." onkeypress="if(event.key==='Enter') submitComment('${post.id}')">
+          <button class="btn btn-orange" style="padding:6px 12px;font-size:12px" onclick="submitComment('${post.id}')">Gửi</button>
+        </div>
+        <div class="comment-list">
+          ${commentsHtml}
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function toggleCommentBox(postId) {
+  const box = document.getElementById(comment-box-${postId});
+  box.style.display = (box.style.display === "block") ? "none" : "block";
+  if (box.style.display === "block") document.getElementById(input-${postId}).focus();
+}
+
+function submitComment(postId) {
+  const input = document.getElementById(input-${postId});
+  const text = input.value.trim();
+  if (!text) return;
+
+  const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  const userName = session.name || "Tuấn Phong";
+  const targetPost = publicFeed.find(p => p.id === postId);
+  if (targetPost) {
+    targetPost.comments.push({ name: userName, text });
+    input.value = "";
+    renderPublicFeed();
+    document.getElementById(comment-box-${postId}).style.display = "block";
+  }
+}
+
+function postToPublicFeed() {
+  const text = document.getElementById("feedPostInput").value.trim();
+  if (!text) return alert("Vui lòng nhập nội dung!");
+
+  const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  const newPost = {
+    id: "post_" + Date.now(),
+    authorName: session.name || "Tuấn Phong",
+    authorAvatar: session.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100",
+    authorMajor: ${session.major || 'Marketing'} · ${session.year ? session.year.split(' ')[0] : 'K52'},
+    content: text,
+    time: "Vừa xong",
+    likes: 0,
+    comments: []
+  };
+
+  publicFeed.unshift(newPost);
+  document.getElementById("feedPostInput").value = "";
+  renderPublicFeed();
+}
+
+function postToCurrentWall() {
+  const text = document.getElementById("profilePostInput").value.trim();
+  if (!text) return alert("Vui lòng nhập nội dung!");
+
+  const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  const newPost = {
+    id: "post_" + Date.now(),
+    authorName: session.name || "Tuấn Phong",
+    authorAvatar: session.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100",
+    authorMajor: ${session.major || 'Marketing'} · ${session.year ? session.year.split(' ')[0] : 'K52'},
+    content: text,
+    time: "Vừa xong",
+    likes: 0,
+    comments: []
+  };
+
+  publicFeed.unshift(newPost);
+  document.getElementById("profilePostInput").value = "";
+  renderUserTimelinePosts(session.name);
+}
+
+function handleImageUpload(e, type) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const base64Url = event.target.result;
+    const session = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+
+    if (type === 'avatar') {
+      session.avatar = base64Url;
+      document.getElementById('navAvatarImg').src = base64Url;
+      document.getElementById('feedUserAvatar').src = base64Url;
+      document.getElementById('profileViewAvatar').src = base64Url;
+      document.getElementById('profileMyMiniAvatar').src = base64Url;
+    } else if (type === 'cover') {
+      session.cover = base64Url;
+      document.getElementById('profileViewCover').src = base64Url;
+    }
+
+    localStorage.setItem("ueh_user_session", JSON.stringify(session));
+    renderCards();
+    renderPublicFeed();
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return alert("Vui lòng nhập email!");
+  if (!isValidUehEmail(email)) {
+    return alert("⚠️ Email không đúng định dạng UEH (@st.ueh.edu.vn)!");
+  }
+
+  const existingUser = {
+    name: "Tuấn Phong",
+    email: email,
+    year: "Khóa K52 (Freshman 2026)",
+    major: "Marketing",
+    living: "Khu vực Cơ sở A, B, N • Tự học tại thư viện B1 ban ngày",
+    style: "Học im lặng (Silent Pomodoro), trao đổi qua tin nhắn",
+    goal: "Săn điểm A / Học bổng khuyến khích UEH",
+    bio: "Mình là người hướng nội nên ít khi nói chuyện trước, rất vui được cùng ngồi học thư viện và nhắc nhở nhau làm bài đúng hạn!",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+    cover: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200"
+  };
+
+  localStorage.setItem("ueh_user_session", JSON.stringify(existingUser));
+  updateUI();
+  alert("🎉 Đăng nhập thành công! Hệ thống đã mở khóa Bảng tin và Messenger.");
+  switchView('sec-feed');
+}
+
+function handleSaveProfile() {
+  const name = document.getElementById("profName").value.trim() || "Sinh viên UEH";
+  const year = document.getElementById("profYear").value;
+  const major = document.getElementById("profMajor").value;
+  const living = document.getElementById("profLiving").value;
+  const style = document.getElementById("profStyle").value;
+  const goal = document.getElementById("profGoal").value;
+  const bio = document.getElementById("profBio").value.trim();
+
+  const prevSession = JSON.parse(localStorage.getItem("ueh_user_session") || "{}");
+  const avatar = prevSession.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400";
+  const cover = prevSession.cover || "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200";
+
+  const userProfile = { name, year, major, living, style, goal, bio, avatar, cover };
+
+  localStorage.setItem("ueh_user_session", JSON.stringify(userProfile));
+  updateUI();
+  alert("✅ Cập nhật hồ sơ cá nhân thành công!");
+  viewMyOwnProfile();
+}
+
+function handleLogout() {
+  localStorage.removeItem("ueh_user_session");
+  updateUI();
+  alert("Đã đăng xuất tài khoản.");
+  switchView('sec-home');
+}
+
+function updateUI() {
+  const session = JSON.parse(localStorage.getItem("ueh_user_session"));
+  const guestNav = document.getElementById("guestNav");
+  const userNav = document.getElementById("userNav");
+  const navProtected = document.getElementById("navProtected");
+
+  if (session) {
+    guestNav.style.display = "none";
+    userNav.style.display = "flex";
+    navProtected.style.display = "flex";
+    
+    document.getElementById("navUserName").innerText = session.name;
+    if (session.avatar) {
+      document.getElementById("navAvatarImg").src = session.avatar;
+      document.getElementById("feedUserAvatar").src = session.avatar;
+      document.getElementById("profileMyMiniAvatar").src = session.avatar;
+    }
+  } else {
+    guestNav.style.display = "flex";
+    userNav.style.display = "none";
+    navProtected.style.display = "none";
+  }
+  renderCards();
+}
+
+function renderCards() {
+  const container = document.getElementById("matchGridContainer");
+  if (!container) return;
+  const session = JSON.parse(localStorage.getItem("ueh_user_session"));
+  let list = Object.values(userDatabase);
+  if (session) {
+    list = [{ ...session, match: "Hồ sơ của bạn", isSelf: true }, ...list];
+  }
+
+  container.innerHTML = "";
+  list.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "match-card";
+    card.innerHTML = `
+      <div>
+        <div class="match-header">
+          <div style="display:flex;gap:10px;align-items:center">
+            <img class="clickable-user" onclick="openUserProfile('${m.name}')" src="${m.avatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover">
+            <div>
+              <div style="font-size:17px;font-weight:800;color:var(--ueh-navy)" class="clickable-user" onclick="openUserProfile('${m.name}')">
+                ${m.name} ${m.isSelf ? '<span style="font-size:11px;background:#e85d04;color:#fff;padding:2px 6px;border-radius:4px">Bạn</span>' : ''}
+              </div>
+              <small style="color:var(--text-muted)">${m.major} · ${m.year}</small>
+            </div>
+          </div>
+          <span class="match-score">${m.match}</span>
+        </div>
+        <div style="font-size:13.5px;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;margin:12px 0 14px">
+          <div><b style="color:var(--ueh-navy)">Mục tiêu:</b> ${m.goal}</div>
+          <div><b style="color:var(--ueh-navy)">Phối hợp:</b> ${m.style}</div>
+          <div><b style="color:var(--ueh-navy)">Lịch & Địa điểm:</b> <span class="pill pill-badge">${m.living}</span></div>
+          <div><b style="color:var(--ueh-navy)">Lời nhắn:</b> <i>"${m.bio || 'Rất vui được kết nối cùng bạn!'}"</i></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" style="flex:1;font-size:13px" onclick="openUserProfile('${m.name}')"><i class="fa-solid fa-user"></i> Xem hồ sơ</button>
+        ${!m.isSelf ? <button class="btn btn-orange" style="flex:1;font-size:13px" onclick="navigateToMessengerWith('${m.name}', '${m.avatar}')"><i class="fa-brands fa-facebook-messenger"></i> Nhắn tin</button> : ''}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// KHỞI CHẠY HỆ THỐNG
+updateUI();
+renderPublicFeed();
+</script>
+</body>
+</html>
